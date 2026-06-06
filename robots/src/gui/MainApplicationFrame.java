@@ -3,7 +3,10 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
+import javax.swing.JOptionPane;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -43,7 +46,13 @@ public class MainApplicationFrame extends JFrame
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onWindowClosing();
+            }
+        });
     }
 
     protected LogWindow createLogWindow()
@@ -68,6 +77,7 @@ public class MainApplicationFrame extends JFrame
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createLookAndFeelMenu());
         menuBar.add(createTestMenu());
+        menuBar.add(createFileMenu());
         return menuBar;
     }
 
@@ -131,6 +141,41 @@ public class MainApplicationFrame extends JFrame
             | IllegalAccessException | UnsupportedLookAndFeelException e)
         {
             // just ignore
+        }
+    }
+
+    private JMenu createFileMenu()
+    {
+        JMenu menu = new JMenu("Выход");
+        menu.setMnemonic(KeyEvent.VK_F);
+        menu.add(createExitItem());
+        return menu;
+    }
+
+    private JMenuItem createExitItem()
+    {
+        JMenuItem item = new JMenuItem("Выход", KeyEvent.VK_Q);
+        item.addActionListener(event -> onWindowClosing());
+        return item;
+    }
+
+    private void onWindowClosing()
+    {
+        UIManager.put("OptionPane.yesButtonText", "Да");
+        UIManager.put("OptionPane.noButtonText",  "Нет");
+
+        int result = JOptionPane.showConfirmDialog(
+            this,
+            "Вы уверены, что хотите выйти?",
+            "Подтверждение выхода",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (result == JOptionPane.YES_OPTION)
+        {
+            dispose();
+            System.exit(0);
         }
     }
 }
