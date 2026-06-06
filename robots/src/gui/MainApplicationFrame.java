@@ -17,6 +17,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import java.util.prefs.Preferences;
+
 import log.Logger;
 
 /**
@@ -44,7 +46,7 @@ public class MainApplicationFrame extends JFrame
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400,  400);
         addWindow(gameWindow);
-
+        WindowStateManager.restoreInternalFrame(gameWindow);
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -53,6 +55,7 @@ public class MainApplicationFrame extends JFrame
                 onWindowClosing();
             }
         });
+        WindowStateManager.restoreFrame(this);
     }
 
     protected LogWindow createLogWindow()
@@ -62,6 +65,7 @@ public class MainApplicationFrame extends JFrame
         logWindow.setSize(300, 800);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
+        WindowStateManager.restoreInternalFrame(logWindow);
         Logger.debug("Протокол работает");
         return logWindow;
     }
@@ -174,6 +178,9 @@ public class MainApplicationFrame extends JFrame
 
         if (result == JOptionPane.YES_OPTION)
         {
+            WindowStateManager.saveFrame(this);
+            for (JInternalFrame frame : desktopPane.getAllFrames())
+                WindowStateManager.saveInternalFrame(frame);
             dispose();
             System.exit(0);
         }
