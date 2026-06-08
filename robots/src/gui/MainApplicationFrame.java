@@ -46,6 +46,9 @@ public class MainApplicationFrame extends JFrame
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400,  400);
         addWindow(gameWindow);
+        RobotInfoWindow robotInfoWindow = new RobotInfoWindow(gameWindow.getModel());
+        robotInfoWindow.setLocation(420, 10);
+        addWindow(robotInfoWindow);
         WindowStateManager.restoreInternalFrame(gameWindow);
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
