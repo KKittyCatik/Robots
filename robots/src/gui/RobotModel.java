@@ -15,7 +15,7 @@ public class RobotModel
     private volatile int targetPositionY = 100;
 
     public static final double MAX_VELOCITY = 0.1;
-    public static final double MAX_ANGULAR_VELOCITY = 0.001;
+    public static final double MAX_ANGULAR_VELOCITY = 0.005;
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -46,7 +46,7 @@ public class RobotModel
         double distance = distance(
             targetPositionX, targetPositionY,
             robotPositionX, robotPositionY);
-        if (distance < 0.5)
+        if (distance < 5)
             return;
 
         double angleToTarget = angleTo(
@@ -58,10 +58,15 @@ public class RobotModel
         while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
 
         double angularVelocity = 0;
-        if (angleDiff > 0) angularVelocity =  MAX_ANGULAR_VELOCITY;
-        if (angleDiff < 0) angularVelocity = -MAX_ANGULAR_VELOCITY;
+        if (Math.abs(angleDiff) > 0.01) {
+            if (angleDiff > 0) angularVelocity =  MAX_ANGULAR_VELOCITY;
+            if (angleDiff < 0) angularVelocity = -MAX_ANGULAR_VELOCITY;
+        }
 
-        moveRobot(MAX_VELOCITY, angularVelocity, 10, fieldWidth, fieldHeight);
+        // тормозим если смотрим не туда
+        double velocity = Math.abs(angleDiff) < 0.5 ? MAX_VELOCITY : MAX_VELOCITY * 0.1;
+
+        moveRobot(velocity, angularVelocity, 10, fieldWidth, fieldHeight);
     }
 
     private void moveRobot(double velocity, double angularVelocity,
